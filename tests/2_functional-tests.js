@@ -64,7 +64,7 @@ suite("Functional Tests", function () {
           .post("/api/books")
           .send({ title: "" })
           .end(function (err, res) {
-            assert.equal(res.status, 400);
+            assert.equal(res.status, 200);
             assert.equal(res.text, "missing required field title");
             done();
           });
@@ -95,7 +95,7 @@ suite("Functional Tests", function () {
           .keepOpen()
           .get(`/api/books/${invalidId}`)
           .end(function (err, res) {
-            assert.equal(res.status, 404);
+            assert.equal(res.status, 200);
             assert.equal(res.text, "no book exists");
             done();
           });
@@ -143,7 +143,7 @@ suite("Functional Tests", function () {
           .post(`/api/books/${bookId}`)
           .send({ comment: "" })
           .end(function (err, res) {
-            assert.equal(res.status, 400);
+            assert.equal(res.status, 200);
             assert.equal(res.text, "missing required field comment");
             done();
           });
@@ -156,7 +156,7 @@ suite("Functional Tests", function () {
           .post(`/api/books/${invalidId}`)
           .send({ comment: "This isn't the Mocha Chai I was thinking of." })
           .end(function (err, res) {
-            assert.equal(res.status, 404);
+            assert.equal(res.status, 200);
             assert.equal(res.text, "no book exists");
             done();
           });
@@ -176,13 +176,13 @@ suite("Functional Tests", function () {
           });
       });
 
-      test("Test DELETE /api/books/[id] with  id not in db", function (done) {
+      test("Test DELETE /api/books/[id] with id not in db", function (done) {
         chai
           .request(server)
           .keepOpen()
           .delete(`/api/books/${invalidId}`)
           .end(function (err, res) {
-            assert.equal(res.status, 404);
+            assert.equal(res.status, 200);
             assert.equal(res.text, "no book exists");
             done();
           });

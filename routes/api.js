@@ -23,8 +23,6 @@ module.exports = function (app) {
   app
     .route("/api/books")
     .get(async function (req, res) {
-      //response will be array of book objects
-      //json res format: [{"_id": bookid, "title": book_title, "commentcount": num_of_comments },...]
       const books = await Book.find({}, "_id title commentcount");
       if (books.length === 0) return res.status(204).send("No books found");
       res.json(books);
@@ -32,7 +30,7 @@ module.exports = function (app) {
 
     .post(async function (req, res) {
       const title = req.body.title;
-      if (!title || title === "") return res.status(400).send("missing required field title");
+      if (!title || title === "") return res.status(200).send("missing required field title");
       const newBook = new Book({ title: title });
       try {
         const savedBook = await newBook.save();
@@ -43,10 +41,9 @@ module.exports = function (app) {
     })
 
     .delete(async function (req, res) {
-      //if successful response will be 'complete delete successful'
       try {
         const deletedBooks = await Book.deleteMany({});
-        if (deletedBooks.deletedCount === 0) return res.status(404).send("no books exist");
+        if (deletedBooks.deletedCount === 0) return res.status(200).send("no books exist");
         res.status(200).send("complete delete successful");
       } catch (error) {
         res.status(500).json({ error: "Internal server error" });
@@ -57,19 +54,17 @@ module.exports = function (app) {
     .route("/api/books/:id")
     .get(async function (req, res) {
       const bookid = req.params.id;
-      //json res format: {"_id": bookid, "title": book_title, "comments": [comment,comment,...]}
       const book = await Book.findById(bookid, "_id title comments");
-      if (!book) return res.status(404).send("no book exists");
+      if (!book) return res.status(200).send("no book exists");
       res.json(book);
     })
 
     .post(async function (req, res) {
       const bookid = req.params.id;
       const comment = req.body.comment;
-      //json res format same as .get
       const book = await Book.findById(bookid);
-      if (!book) return res.status(404).send("no book exists");
-      if (!comment || comment === "") return res.status(400).send("missing required field comment");
+      if (!book) return res.status(200).send("no book exists");
+      if (!comment || comment === "") return res.status(200).send("missing required field comment");
       book.comments.push(comment);
       book.commentcount = book.comments.length;
       try {
@@ -82,10 +77,9 @@ module.exports = function (app) {
 
     .delete(async function (req, res) {
       const bookid = req.params.id;
-      //if successful response will be 'delete successful'
       try {
         const deletedBook = await Book.findByIdAndDelete(bookid);
-        if (!deletedBook) return res.status(404).send("no book exists");
+        if (!deletedBook) return res.status(200).send("no book exists");
         res.status(200).send("delete successful");
       } catch (error) {
         res.status(500).json({ error: "Internal server error" });
